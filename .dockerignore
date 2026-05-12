@@ -1,0 +1,13 @@
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+data
+deepseek_ocr
+test
+docs
+*.docx
+checkpoint-1/optimizer.pt
+checkpoint-1/scheduler.pt
+checkpoint-1/rng_state.pth
+checkpoint-1/training_args.bin

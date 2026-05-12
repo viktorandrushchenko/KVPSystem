@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Document KVP Lab</title>
+    <link rel="stylesheet" href="/static/styles.css?v=8" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="statusBlock">
+          <p id="modelStatus">Checking model...</p>
+        </div>
+        <button id="createGroupButton" type="button">Add document group</button>
+      </header>
+
+      <section class="workspace">
+        <aside class="documents">
+          <div class="searchBox">
+            <input id="searchInput" type="search" placeholder="Search by group, document, key, value..." />
+            <button id="searchButton" type="button">Search</button>
+          </div>
+          <div class="panelHeader">
+            <h2>Document groups</h2>
+            <button id="refreshButton" type="button">Refresh</button>
+          </div>
+          <div class="bulkBox">
+            <div class="bulkTop">
+              <label class="checkLine">
+                <input id="selectAllDocuments" type="checkbox" />
+                Select all
+              </label>
+              <span id="selectedDocumentsCount" class="status">0 selected</span>
+            </div>
+            <div class="buttonRow bulkButtons">
+              <button id="extractSelectedDocumentsButton" type="button">Extract selected</button>
+            </div>
+          </div>
+          <div id="documentList" class="documentList"></div>
+        </aside>
+
+        <section class="details">
+          <div id="emptyState" class="emptyState">Select a group or create a new one.</div>
+          <div id="documentView" class="documentView hidden">
+            <div class="pagePane">
+              <div class="pageTabs" id="pageTabs"></div>
+              <div class="preview">
+                <img id="previewImage" alt="" />
+              </div>
+            </div>
+            <div class="results">
+              <div class="panelHeader groupHeader">
+                <h2 id="documentTitle"></h2>
+                <p id="documentMeta" hidden></p>
+                <div class="actions">
+                  <label class="secondaryUploadButton">
+                    <input id="pageFileInput" type="file" accept="image/*,.pdf" multiple />
+                    Add files
+                  </label>
+                  <label class="secondaryUploadButton">
+                    <input id="folderInput" type="file" accept="image/*,.pdf" multiple webkitdirectory />
+                    Add folder
+                  </label>
+                  <button id="renameDocumentButton" type="button">Rename group</button>
+                  <button id="deleteDocumentButton" type="button" class="dangerButton">Delete group</button>
+                </div>
+              </div>
+
+              <div class="queryBox">
+                <input id="keyInput" type="text" placeholder="Key to find, for example: Invoice Number" />
+                <div class="buttonRow">
+                  <button id="extractPageButton" type="button">Extract document</button>
+                  <button id="extractDocumentButton" type="button">Extract group</button>
+                </div>
+              </div>
+
+              <div class="pageActions">
+                <div id="currentDocumentTitle" class="currentDocumentTitle"></div>
+                <div class="buttonRow documentActionButtons">
+                  <button id="renumberPageButton" type="button">Document settings</button>
+                  <button id="deletePageButton" type="button" class="dangerButton">Delete document</button>
+                </div>
+              </div>
+
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Key</th>
+                      <th>Value</th>
+                      <th>BBox</th>
+                      <th>Raw</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="kvTable"></tbody>
+                </table>
+              </div>
+              <pre id="rawOutput" class="rawConsole"></pre>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="/static/app.js?v=12"></script>
+  </body>
+</html>

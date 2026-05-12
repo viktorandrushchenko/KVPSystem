@@ -1,0 +1,38 @@
+services:
+  kvp-app:
+    build:
+      context: .
+      args:
+        TORCH_INDEX_URL: https://download.pytorch.org/whl/cu118
+      extra_hosts:
+        - "deb.debian.org:151.101.2.132"
+        - "debian.map.fastlydns.net:151.101.2.132"
+        - "download.pytorch.org:3.164.230.31"
+        - "files.pythonhosted.org:151.101.1.63"
+        - "download-r2.pytorch.org:18.161.6.56"
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "download.pytorch.org:3.164.230.31"
+      - "files.pythonhosted.org:151.101.1.63"
+      - "download-r2.pytorch.org:18.161.6.56"
+    gpus: all
+    environment:
+      DEEPSEEK_OCR_BASE_MODEL: /models/deepseek_ocr
+      DEEPSEEK_OCR_ADAPTER: /app/checkpoint-1
+      DEEPSEEK_OCR_DEVICE_MAP: none
+      DEEPSEEK_OCR_MAX_MEMORY: ""
+      DEEPSEEK_OCR_BASE_SIZE: "512"
+      DEEPSEEK_OCR_IMAGE_SIZE: "512"
+      DEEPSEEK_OCR_CROP_MODE: "false"
+      DEEPSEEK_OCR_MAX_NEW_TOKENS: "128"
+    volumes:
+      - ./data:/app/data
+      - ./deepseek_ocr:/models/deepseek_ocr:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
