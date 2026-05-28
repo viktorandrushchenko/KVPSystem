@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .bg{fill:#f8fafc}.title{font:700 34px Arial,sans-serif;fill:#0f172a}
+      .step{fill:#fff;stroke:#cbd5e1;stroke-width:2;rx:14}.blue{fill:#eff6ff;stroke:#2563eb}
+      .green{fill:#ecfdf5;stroke:#059669}.orange{fill:#fff7ed;stroke:#ea580c}.purple{fill:#f5f3ff;stroke:#7c3aed}.red{fill:#fef2f2;stroke:#dc2626}
+      .label{font:700 21px Arial,sans-serif;fill:#0f172a}.small{font:400 15px Arial,sans-serif;fill:#334155}
+      .num{font:700 18px Arial,sans-serif;fill:#fff}.circle{fill:#2563eb}.arrow{stroke:#2563eb;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .return{stroke:#64748b;stroke-width:2.5;fill:none;stroke-dasharray:8 6;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="1600" height="720"/>
+  <text class="title" x="800" y="58" text-anchor="middle">Сценарий извлечения значения по ключу</text>
+
+  <rect class="step blue" x="50" y="145" width="180" height="130" rx="14"/>
+  <circle class="circle" cx="82" cy="178" r="17"/><text class="num" x="82" y="184" text-anchor="middle">1</text>
+  <text class="label" x="140" y="198" text-anchor="middle">Выбор</text>
+  <text class="label" x="140" y="224" text-anchor="middle">документа</text>
+  <text class="small" x="140" y="254" text-anchor="middle">группа и файл</text>
+
+  <rect class="step blue" x="270" y="145" width="180" height="130" rx="14"/>
+  <circle class="circle" cx="302" cy="178" r="17"/><text class="num" x="302" y="184" text-anchor="middle">2</text>
+  <text class="label" x="360" y="198" text-anchor="middle">Выбор</text>
+  <text class="label" x="360" y="224" text-anchor="middle">чекпоинта</text>
+  <text class="small" x="360" y="254" text-anchor="middle">adapter path</text>
+
+  <rect class="step blue" x="490" y="145" width="180" height="130" rx="14"/>
+  <circle class="circle" cx="522" cy="178" r="17"/><text class="num" x="522" y="184" text-anchor="middle">3</text>
+  <text class="label" x="580" y="198" text-anchor="middle">Ввод</text>
+  <text class="label" x="580" y="224" text-anchor="middle">ключа</text>
+  <text class="small" x="580" y="254" text-anchor="middle">например Total</text>
+
+  <rect class="step green" x="710" y="145" width="180" height="130" rx="14"/>
+  <circle class="circle" cx="742" cy="178" r="17"/><text class="num" x="742" y="184" text-anchor="middle">4</text>
+  <text class="label" x="800" y="198" text-anchor="middle">Запрос</text>
+  <text class="label" x="800" y="224" text-anchor="middle">к API</text>
+  <text class="small" x="800" y="254" text-anchor="middle">FastAPI</text>
+
+  <rect class="step red" x="930" y="145" width="180" height="130" rx="14"/>
+  <circle class="circle" cx="962" cy="178" r="17"/><text class="num" x="962" y="184" text-anchor="middle">5</text>
+  <text class="label" x="1020" y="198" text-anchor="middle">Запрос</text>
+  <text class="label" x="1020" y="224" text-anchor="middle">к модели</text>
+  <text class="small" x="1020" y="254" text-anchor="middle">image + key</text>
+
+  <rect class="step orange" x="1150" y="145" width="180" height="130" rx="14"/>
+  <circle class="circle" cx="1182" cy="178" r="17"/><text class="num" x="1182" y="184" text-anchor="middle">6</text>
+  <text class="label" x="1240" y="198" text-anchor="middle">Парсинг</text>
+  <text class="label" x="1240" y="224" text-anchor="middle">ответа</text>
+  <text class="small" x="1240" y="254" text-anchor="middle">value + bbox</text>
+
+  <rect class="step purple" x="1370" y="145" width="180" height="130" rx="14"/>
+  <circle class="circle" cx="1402" cy="178" r="17"/><text class="num" x="1402" y="184" text-anchor="middle">7</text>
+  <text class="label" x="1460" y="198" text-anchor="middle">Запись</text>
+  <text class="label" x="1460" y="224" text-anchor="middle">в БД</text>
+  <text class="small" x="1460" y="254" text-anchor="middle">SQLite</text>
+
+  <path class="arrow" d="M230 210 L260 210"/><path class="arrow" d="M450 210 L480 210"/>
+  <path class="arrow" d="M670 210 L700 210"/><path class="arrow" d="M890 210 L920 210"/>
+  <path class="arrow" d="M1110 210 L1140 210"/><path class="arrow" d="M1330 210 L1360 210"/>
+
+  <rect class="step" x="485" y="455" width="630" height="125" rx="14"/>
+  <circle class="circle" cx="530" cy="495" r="17"/><text class="num" x="530" y="501" text-anchor="middle">8</text>
+  <text class="label" x="800" y="499" text-anchor="middle">Отображение результата в интерфейсе</text>
+  <text class="small" x="800" y="532" text-anchor="middle">таблица: key, value, bbox, raw output</text>
+  <text class="small" x="800" y="556" text-anchor="middle">при клике по строке bbox отображается поверх изображения документа</text>
+
+  <path class="arrow" d="M1460 275 C1460 390 1190 516 1125 516"/>
+  <path class="return" d="M485 516 C260 516 140 405 140 285"/>
+</svg>

@@ -7,12 +7,14 @@ data/*.sqlite3
 data/uploads/
 data/pages/
 data/previews/
+data/annotation_exports/
 
 .env
 
 
 deepseek_ocr/
 checkpoint-*/
+trained_checkpoints/
 *.safetensors
 *.bin
 *.pt

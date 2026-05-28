@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Document KVP Lab</title>
-    <link rel="stylesheet" href="/static/styles.css?v=8" />
+    <link rel="stylesheet" href="/static/styles.css?v=11" />
   </head>
   <body>
     <main class="shell">
@@ -12,10 +12,14 @@
         <div class="statusBlock">
           <p id="modelStatus">Checking model...</p>
         </div>
+        <nav class="tabs">
+          <button id="extractTabButton" class="tabButton active" type="button">Extraction</button>
+          <button id="annotateTabButton" class="tabButton" type="button">Annotation & training</button>
+        </nav>
         <button id="createGroupButton" type="button">Add document group</button>
       </header>
 
-      <section class="workspace">
+      <section id="extractTab" class="workspace appTab active">
         <aside class="documents">
           <div class="searchBox">
             <input id="searchInput" type="search" placeholder="Search by group, document, key, value..." />
@@ -69,6 +73,10 @@
 
               <div class="queryBox">
                 <input id="keyInput" type="text" placeholder="Key to find, for example: Invoice Number" />
+                <div class="checkpointControl">
+                  <select id="checkpointSelect" title="Checkpoint for extraction"></select>
+                  <button id="renameCheckpointButton" type="button">Rename</button>
+                </div>
                 <div class="buttonRow">
                   <button id="extractPageButton" type="button">Extract document</button>
                   <button id="extractDocumentButton" type="button">Extract group</button>
@@ -102,7 +110,62 @@
           </div>
         </section>
       </section>
+      <section id="annotateTab" class="annotationWorkspace appTab">
+        <aside class="annotationPanel">
+          <div class="panelHeader">
+            <h2>Annotation datasets</h2>
+            <button id="newAnnotationSetButton" type="button">New dataset</button>
+          </div>
+          <label class="fieldLabel">
+            Active dataset
+            <select id="annotationSetSelect"></select>
+          </label>
+          <div id="annotationSetList" class="documentList"></div>
+          <div class="panelHeader">
+            <h2>Source</h2>
+          </div>
+          <label class="fieldLabel">
+            Group
+            <select id="annotationGroupSelect"></select>
+          </label>
+          <label class="fieldLabel">
+            Document
+            <select id="annotationPageSelect"></select>
+          </label>
+          <label class="fieldLabel">
+            Key
+            <input id="annotationKeyInput" type="text" placeholder="Invoice Number" />
+          </label>
+          <label class="fieldLabel">
+            Value
+            <input id="annotationValueInput" type="text" placeholder="INV-001" />
+          </label>
+          <label class="fieldLabel">
+            Training steps
+            <input id="trainingStepsInput" type="number" min="1" step="1" value="100" />
+          </label>
+          <div id="bboxCoordinates" class="bboxCoordinates">BBox: not selected</div>
+          <div class="buttonRow annotationButtons">
+            <button id="saveAnnotationButton" type="button">Save annotation</button>
+            <button id="trainAnnotationSetButton" type="button">Train model</button>
+          </div>
+          <p id="annotationStatus" class="status"></p>
+        </aside>
+        <section class="annotationCanvasPanel">
+          <div class="annotationPreview" id="annotationPreview">
+            <img id="annotationImage" alt="" />
+          </div>
+        </section>
+        <aside class="annotationPanel">
+          <div class="panelHeader">
+            <h2>Saved annotations</h2>
+            <button id="refreshAnnotationButton" type="button">Refresh</button>
+          </div>
+          <div id="annotationList" class="annotationList"></div>
+          <pre id="trainingLog" class="rawConsole trainingLog"></pre>
+        </aside>
+      </section>
     </main>
-    <script src="/static/app.js?v=12"></script>
+    <script src="/static/app.js?v=15"></script>
   </body>
 </html>

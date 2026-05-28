@@ -4,9 +4,19 @@ let selectedDocument = null;
 let selectedPageId = null;
 let pages = [];
 let selectedBulkDocumentIds = new Set();
+let checkpoints = [];
+let annotationSets = [];
+let selectedAnnotationSetId = null;
+let annotationPages = [];
+let annotationBbox = null;
+let annotationDrag = null;
 
 const modelStatus = document.querySelector("#modelStatus");
 const createGroupButton = document.querySelector("#createGroupButton");
+const extractTabButton = document.querySelector("#extractTabButton");
+const annotateTabButton = document.querySelector("#annotateTabButton");
+const extractTab = document.querySelector("#extractTab");
+const annotateTab = document.querySelector("#annotateTab");
 const pageFileInput = document.querySelector("#pageFileInput");
 const folderInput = document.querySelector("#folderInput");
 const refreshButton = document.querySelector("#refreshButton");
@@ -30,8 +40,27 @@ const deletePageButton = document.querySelector("#deletePageButton");
 const extractPageButton = document.querySelector("#extractPageButton");
 const extractDocumentButton = document.querySelector("#extractDocumentButton");
 const keyInput = document.querySelector("#keyInput");
+const checkpointSelect = document.querySelector("#checkpointSelect");
+const renameCheckpointButton = document.querySelector("#renameCheckpointButton");
 const kvTable = document.querySelector("#kvTable");
 const rawOutput = document.querySelector("#rawOutput");
+const newAnnotationSetButton = document.querySelector("#newAnnotationSetButton");
+const annotationSetSelect = document.querySelector("#annotationSetSelect");
+const annotationSetList = document.querySelector("#annotationSetList");
+const annotationGroupSelect = document.querySelector("#annotationGroupSelect");
+const annotationPageSelect = document.querySelector("#annotationPageSelect");
+const annotationKeyInput = document.querySelector("#annotationKeyInput");
+const annotationValueInput = document.querySelector("#annotationValueInput");
+const saveAnnotationButton = document.querySelector("#saveAnnotationButton");
+const trainAnnotationSetButton = document.querySelector("#trainAnnotationSetButton");
+const trainingStepsInput = document.querySelector("#trainingStepsInput");
+const bboxCoordinates = document.querySelector("#bboxCoordinates");
+const annotationStatus = document.querySelector("#annotationStatus");
+const annotationPreview = document.querySelector("#annotationPreview");
+const annotationImage = document.querySelector("#annotationImage");
+const annotationList = document.querySelector("#annotationList");
+const refreshAnnotationButton = document.querySelector("#refreshAnnotationButton");
+const trainingLog = document.querySelector("#trainingLog");
 let activeExtractionId = null;
 
 async function api(path, options = {}) {
@@ -55,6 +84,30 @@ async function loadDocuments() {
   const visibleIds = new Set(documents.map((doc) => doc.id));
   selectedBulkDocumentIds = new Set([...selectedBulkDocumentIds].filter((id) => visibleIds.has(id)));
   renderList();
+  renderAnnotationSources();
+}
+
+async function loadCheckpoints() {
+  checkpoints = await api("/api/checkpoints");
+  if (!checkpointSelect) return;
+  checkpointSelect.innerHTML = "";
+  for (const checkpoint of checkpoints) {
+    const option = document.createElement("option");
+    option.value = checkpoint.path;
+    option.textContent = checkpoint.folder_name && checkpoint.folder_name !== checkpoint.name
+      ? `${checkpoint.name} (${checkpoint.folder_name})`
+      : checkpoint.name;
+    checkpointSelect.appendChild(option);
+  }
+}
+
+async function loadAnnotationSets() {
+  annotationSets = await api("/api/annotation-sets");
+  if (!selectedAnnotationSetId && annotationSets.length) {
+    selectedAnnotationSetId = annotationSets[0].id;
+  }
+  renderAnnotationSets();
+  await renderAnnotations();
 }
 
 function renderList() {
@@ -216,6 +269,7 @@ async function extractSelectedPage() {
   setBusy(extractPageButton, "Processing...");
   const form = new FormData();
   form.append("key", key);
+  appendCheckpoint(form);
   try {
     const page = await api(`/api/pages/${selectedPageId}/extract`, { method: "POST", body: form });
     pages = pages.map((item) => (item.id === page.id ? page : item));
@@ -234,6 +288,7 @@ async function extractSelectedDocument() {
   setBusy(extractDocumentButton, "Processing...");
   const form = new FormData();
   form.append("key", key);
+  appendCheckpoint(form);
   try {
     await api(`/api/documents/${selectedDocumentId}/extract`, { method: "POST", body: form });
     pages = await api(`/api/documents/${selectedDocumentId}/pages`);
@@ -257,6 +312,7 @@ async function extractBulkDocuments() {
   const form = new FormData();
   form.append("key", key);
   form.append("all_documents", "false");
+  appendCheckpoint(form);
   for (const id of selectedIds) {
     form.append("document_ids", String(id));
   }
@@ -375,6 +431,322 @@ function drawBbox(bbox) {
   previewImage.parentElement.appendChild(overlay);
 }
 
+function appendCheckpoint(form) {
+  const value = checkpointSelect?.value;
+  if (value) form.append("checkpoint_path", value);
+}
+
+function switchTab(name) {
+  const annotationMode = name === "annotate";
+  extractTab.classList.toggle("active", !annotationMode);
+  annotateTab.classList.toggle("active", annotationMode);
+  extractTabButton.classList.toggle("active", !annotationMode);
+  annotateTabButton.classList.toggle("active", annotationMode);
+  if (annotationMode) {
+    renderAnnotationSources();
+    loadAnnotationSets().catch(showAnnotationError);
+  }
+}
+
+function renderAnnotationSets() {
+  if (!annotationSetList) return;
+  annotationSetList.innerHTML = "";
+  if (annotationSetSelect) {
+    annotationSetSelect.innerHTML = '<option value="">Create/select dataset</option>';
+    for (const set of annotationSets) {
+      const option = document.createElement("option");
+      option.value = set.id;
+      option.textContent = `${set.name} (${set.annotation_count || 0})`;
+      annotationSetSelect.appendChild(option);
+    }
+    annotationSetSelect.value = selectedAnnotationSetId ? String(selectedAnnotationSetId) : "";
+  }
+  if (!annotationSets.length) {
+    annotationSetList.innerHTML = '<p class="status">No annotation datasets yet. It will be created automatically on first save.</p>';
+    return;
+  }
+  for (const set of annotationSets) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `docItem ${set.id === selectedAnnotationSetId ? "active" : ""}`;
+    button.innerHTML = `
+      <strong>${escapeHtml(set.name)}</strong>
+      <span class="status">${escapeHtml(set.status)} - ${set.annotation_count || 0} annotations</span>
+    `;
+    button.addEventListener("click", async () => {
+      selectedAnnotationSetId = set.id;
+      renderAnnotationSets();
+      await renderAnnotations();
+    });
+    annotationSetList.appendChild(button);
+  }
+}
+
+function renderAnnotationSources() {
+  if (!annotationGroupSelect) return;
+  const previousGroup = annotationGroupSelect.value || String(selectedDocumentId || "");
+  annotationGroupSelect.innerHTML = '<option value="">Select group</option>';
+  for (const doc of documents) {
+    const option = document.createElement("option");
+    option.value = doc.id;
+    option.textContent = doc.filename;
+    annotationGroupSelect.appendChild(option);
+  }
+  if ([...annotationGroupSelect.options].some((option) => option.value === previousGroup)) {
+    annotationGroupSelect.value = previousGroup;
+  }
+  loadAnnotationPages().catch(showAnnotationError);
+}
+
+async function loadAnnotationPages() {
+  const groupId = annotationGroupSelect?.value;
+  annotationPages = [];
+  annotationPageSelect.innerHTML = '<option value="">Select document</option>';
+  clearAnnotationSelection();
+  if (!groupId) return;
+  annotationPages = await api(`/api/documents/${groupId}/pages`);
+  for (const page of annotationPages) {
+    const option = document.createElement("option");
+    option.value = page.id;
+    option.textContent = pageLabel(page);
+    annotationPageSelect.appendChild(option);
+  }
+  if (annotationPages.length) {
+    annotationPageSelect.value = annotationPages[0].id;
+    renderAnnotationImage();
+  }
+}
+
+function renderAnnotationImage() {
+  clearAnnotationSelection();
+  const pageId = annotationPageSelect?.value;
+  if (!pageId) {
+    annotationImage.removeAttribute("src");
+    return;
+  }
+  annotationImage.src = `/api/pages/${pageId}/image`;
+}
+
+async function createAnnotationSet() {
+  const name = prompt("Dataset name");
+  if (!name || !name.trim()) return;
+  const form = new FormData();
+  form.append("name", name.trim());
+  const set = await api("/api/annotation-sets", { method: "POST", body: form });
+  selectedAnnotationSetId = set.id;
+  await loadAnnotationSets();
+}
+
+async function ensureAnnotationSet() {
+  if (selectedAnnotationSetId) return selectedAnnotationSetId;
+  const groupOption = annotationGroupSelect.options[annotationGroupSelect.selectedIndex];
+  const name = groupOption?.value ? `${groupOption.textContent} annotations` : "Manual annotations";
+  const form = new FormData();
+  form.append("name", name.trim());
+  const set = await api("/api/annotation-sets", { method: "POST", body: form });
+  selectedAnnotationSetId = set.id;
+  await loadAnnotationSets();
+  return selectedAnnotationSetId;
+}
+
+async function renderAnnotations() {
+  if (!annotationList) return;
+  annotationList.innerHTML = "";
+  trainingLog.textContent = "";
+  if (!selectedAnnotationSetId) {
+    annotationList.innerHTML = '<p class="status">Select or create a dataset.</p>';
+    return;
+  }
+  const set = await api(`/api/annotation-sets/${selectedAnnotationSetId}`);
+  trainingLog.textContent = set.training_log || "";
+  const rows = set.annotations || [];
+  if (!rows.length) {
+    annotationList.innerHTML = '<p class="status">No saved annotations.</p>';
+    return;
+  }
+  for (const item of rows) {
+    const row = document.createElement("div");
+    row.className = "annotationItem";
+    row.innerHTML = `
+      <strong>${escapeHtml(item.query_key)} = ${escapeHtml(item.value_text)}</strong>
+      <span class="status">${escapeHtml(item.group_name)} / ${escapeHtml(item.page_title || `Document ${item.page_number}`)}</span>
+      <span class="status">${escapeHtml(JSON.stringify(item.bbox))}</span>
+      <button type="button" class="smallButton dangerButton">Delete</button>
+    `;
+    row.addEventListener("click", () => showAnnotation(item));
+    row.querySelector("button").addEventListener("click", (event) => deleteAnnotation(item.id, event));
+    annotationList.appendChild(row);
+  }
+}
+
+async function saveAnnotation() {
+  const pageId = annotationPageSelect.value;
+  const key = annotationKeyInput.value.trim();
+  const value = annotationValueInput.value.trim();
+  if (!pageId) return alert("Select a document.");
+  if (!key || !value) return alert("Enter key and value.");
+  if (!annotationBbox) return alert("Draw a bbox on the document.");
+  const setId = await ensureAnnotationSet();
+  const form = new FormData();
+  form.append("annotation_set_id", String(setId));
+  form.append("page_id", pageId);
+  form.append("query_key", key);
+  form.append("value_text", value);
+  form.append("bbox_json", JSON.stringify([annotationBbox]));
+  await api("/api/annotations", { method: "POST", body: form });
+  annotationStatus.textContent = "Annotation saved.";
+  annotationValueInput.value = "";
+  clearAnnotationSelection();
+  await loadAnnotationSets();
+}
+
+async function deleteAnnotation(id, event) {
+  event.stopPropagation();
+  if (!confirm("Delete this annotation?")) return;
+  await api(`/api/annotations/${id}`, { method: "DELETE" });
+  await loadAnnotationSets();
+}
+
+async function trainAnnotationSet() {
+  if (!selectedAnnotationSetId) return alert("Select an annotation dataset first.");
+  setBusy(trainAnnotationSetButton, "Training...");
+  try {
+    const form = new FormData();
+    form.append("steps", String(Math.max(1, Number(trainingStepsInput?.value || 100))));
+    const set = await api(`/api/annotation-sets/${selectedAnnotationSetId}/train`, { method: "POST", body: form });
+    trainingLog.textContent = set.training_log || "Training queued.";
+    await loadAnnotationSets();
+    await loadCheckpoints();
+  } finally {
+    setReady(trainAnnotationSetButton, "Train model");
+  }
+}
+
+async function renameSelectedCheckpoint() {
+  const path = checkpointSelect?.value;
+  if (!path) return alert("Select a checkpoint first.");
+  const checkpoint = checkpoints.find((item) => item.path === path);
+  const currentName = checkpoint?.name || checkpoint?.folder_name || "";
+  const name = prompt("Checkpoint name", currentName);
+  if (!name || !name.trim()) return;
+  const form = new FormData();
+  form.append("path", path);
+  form.append("name", name.trim());
+  await api("/api/checkpoints/name", { method: "PATCH", body: form });
+  await loadCheckpoints();
+  checkpointSelect.value = path;
+}
+
+function showAnnotation(item) {
+  annotationKeyInput.value = item.query_key || "";
+  annotationValueInput.value = item.value_text || "";
+  const group = documents.find((doc) => doc.id === item.document_id);
+  if (group) {
+    annotationGroupSelect.value = group.id;
+    loadAnnotationPages().then(() => {
+      annotationPageSelect.value = item.page_id;
+      renderAnnotationImage();
+      annotationImage.addEventListener("load", () => drawAnnotationBox(item.bbox?.[0] || item.bbox), { once: true });
+    });
+  }
+}
+
+function startAnnotationDraw(event) {
+  if (event.button !== 0) return;
+  event.preventDefault();
+  if (!annotationImage.src || !annotationImage.complete) return;
+  const point = imagePoint(event);
+  if (!point) return;
+  annotationDrag = { start: point, end: point };
+  drawAnnotationRect(point, point);
+}
+
+function moveAnnotationDraw(event) {
+  if (!annotationDrag) return;
+  event.preventDefault();
+  const point = imagePoint(event);
+  if (!point) return;
+  annotationDrag.end = point;
+  drawAnnotationRect(annotationDrag.start, annotationDrag.end);
+}
+
+function finishAnnotationDraw() {
+  if (!annotationDrag) return;
+  const box = pointsToNormalizedBox(annotationDrag.start, annotationDrag.end);
+  annotationDrag = null;
+  if (!box) {
+    clearAnnotationSelection();
+    return;
+  }
+  annotationBbox = box;
+  drawAnnotationBox(box);
+  updateBboxText(box);
+}
+
+function imagePoint(event) {
+  const rect = annotationImage.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;
+  return { x, y, width: rect.width, height: rect.height };
+}
+
+function pointsToNormalizedBox(a, b) {
+  const left = Math.max(0, Math.min(a.x, b.x));
+  const top = Math.max(0, Math.min(a.y, b.y));
+  const right = Math.min(a.width, Math.max(a.x, b.x));
+  const bottom = Math.min(a.height, Math.max(a.y, b.y));
+  if (right - left < 4 || bottom - top < 4) return null;
+  return [
+    Math.round((left / a.width) * 999),
+    Math.round((top / a.height) * 999),
+    Math.round((right / a.width) * 999),
+    Math.round((bottom / a.height) * 999),
+  ];
+}
+
+function drawAnnotationRect(a, b) {
+  const box = pointsToNormalizedBox(a, b);
+  if (box) drawAnnotationBox(box, "annotationDraftBox");
+}
+
+function drawAnnotationBox(box, className = "annotationBbox") {
+  document.querySelector(".annotationBbox")?.remove();
+  document.querySelector(".annotationDraftBox")?.remove();
+  if (!Array.isArray(box) || box.length !== 4) return;
+  const imageRect = annotationImage.getBoundingClientRect();
+  const parentRect = annotationPreview.getBoundingClientRect();
+  const overlay = document.createElement("div");
+  overlay.className = className;
+  const [x1, y1, x2, y2] = box.map(Number);
+  overlay.style.left = `${imageRect.left - parentRect.left + (x1 / 999) * imageRect.width}px`;
+  overlay.style.top = `${imageRect.top - parentRect.top + (y1 / 999) * imageRect.height}px`;
+  overlay.style.width = `${((x2 - x1) / 999) * imageRect.width}px`;
+  overlay.style.height = `${((y2 - y1) / 999) * imageRect.height}px`;
+  annotationPreview.appendChild(overlay);
+  if (className === "annotationBbox") {
+    annotationBbox = box;
+    updateBboxText(box);
+  }
+}
+
+function clearAnnotationSelection() {
+  annotationBbox = null;
+  annotationDrag = null;
+  document.querySelector(".annotationBbox")?.remove();
+  document.querySelector(".annotationDraftBox")?.remove();
+  updateBboxText(null);
+}
+
+function updateBboxText(box) {
+  if (!bboxCoordinates) return;
+  bboxCoordinates.textContent = box ? `BBox: [${box.join(", ")}]` : "BBox: not selected";
+}
+
+function showAnnotationError(error) {
+  if (annotationStatus) annotationStatus.textContent = error.message;
+}
+
 function setBusy(button, text) {
   button.disabled = true;
   button.textContent = text;
@@ -432,6 +804,8 @@ function escapeHtml(value) {
 }
 
 on(createGroupButton, "click", createDocumentGroup);
+on(extractTabButton, "click", () => switchTab("extract"));
+on(annotateTabButton, "click", () => switchTab("annotate"));
 on(pageFileInput, "change", () => uploadDocumentFiles(pageFileInput));
 on(folderInput, "change", () => uploadDocumentFiles(folderInput));
 on(refreshButton, "click", loadDocuments);
@@ -450,10 +824,26 @@ on(searchInput, "keydown", (event) => {
 });
 on(extractPageButton, "click", extractSelectedPage);
 on(extractDocumentButton, "click", extractSelectedDocument);
+on(renameCheckpointButton, "click", () => renameSelectedCheckpoint().catch(console.error));
 on(renameDocumentButton, "click", renameDocument);
 on(deleteDocumentButton, "click", deleteDocument);
 on(renumberPageButton, "click", renumberPage);
 on(deletePageButton, "click", deletePage);
+on(newAnnotationSetButton, "click", createAnnotationSet);
+on(annotationSetSelect, "change", async () => {
+  selectedAnnotationSetId = annotationSetSelect.value ? Number(annotationSetSelect.value) : null;
+  renderAnnotationSets();
+  await renderAnnotations();
+});
+on(annotationGroupSelect, "change", () => loadAnnotationPages().catch(showAnnotationError));
+on(annotationPageSelect, "change", renderAnnotationImage);
+on(saveAnnotationButton, "click", () => saveAnnotation().catch(showAnnotationError));
+on(trainAnnotationSetButton, "click", () => trainAnnotationSet().catch(showAnnotationError));
+on(refreshAnnotationButton, "click", () => loadAnnotationSets().catch(showAnnotationError));
+on(annotationPreview, "mousedown", startAnnotationDraw);
+on(annotationPreview, "contextmenu", (event) => event.preventDefault());
+on(annotationPreview, "mousemove", moveAnnotationDraw);
+on(document, "mouseup", finishAnnotationDraw);
 
 function on(element, eventName, handler) {
   if (element) element.addEventListener(eventName, handler);
@@ -464,3 +854,5 @@ loadStatus().catch((error) => {
   modelStatus.classList.add("bad");
 });
 loadDocuments().catch(console.error);
+loadCheckpoints().catch(console.error);
+loadAnnotationSets().catch(console.error);

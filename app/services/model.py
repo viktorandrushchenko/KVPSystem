@@ -196,4 +196,15 @@ class DeepseekOcrKvpExtractor:
         return result or None
 
 
-extractor = DeepseekOcrKvpExtractor()
+_extractors: dict[str, DeepseekOcrKvpExtractor] = {}
+
+
+def get_extractor(adapter_path: Path | str | None = None) -> DeepseekOcrKvpExtractor:
+    path = Path(adapter_path) if adapter_path else ADAPTER_PATH
+    key = str(path.resolve()) if path.exists() else str(path)
+    if key not in _extractors:
+        _extractors[key] = DeepseekOcrKvpExtractor(adapter_path=path)
+    return _extractors[key]
+
+
+extractor = get_extractor()

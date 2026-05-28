@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator
 
-from .config import DATA_DIR, DB_PATH, PAGE_DIR, UPLOAD_DIR
+from .config import ANNOTATION_EXPORT_DIR, DATA_DIR, DB_PATH, PAGE_DIR, TRAINED_CHECKPOINT_DIR, UPLOAD_DIR
 
 
 def utc_now() -> str:
@@ -18,6 +18,8 @@ def init_db() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     PAGE_DIR.mkdir(parents=True, exist_ok=True)
+    ANNOTATION_EXPORT_DIR.mkdir(parents=True, exist_ok=True)
+    TRAINED_CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
     with connect() as db:
         db.execute(
             """
@@ -71,6 +73,37 @@ def init_db() -> None:
             )
             """
         )
+        db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS annotation_sets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                status TEXT NOT NULL DEFAULT 'draft',
+                export_path TEXT,
+                checkpoint_path TEXT,
+                training_log TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS annotations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                annotation_set_id INTEGER NOT NULL,
+                page_id INTEGER NOT NULL,
+                query_key TEXT NOT NULL,
+                value_text TEXT NOT NULL,
+                bbox_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(annotation_set_id) REFERENCES annotation_sets(id) ON DELETE CASCADE,
+                FOREIGN KEY(page_id) REFERENCES pages(id) ON DELETE CASCADE
+            )
+            """
+        )
         _migrate_legacy_documents(db)
         _migrate_page_titles(db)
         db.commit()
@@ -103,6 +136,17 @@ def row_to_extraction(row: sqlite3.Row) -> dict[str, Any]:
     bbox = extraction.pop("bbox_json", None)
     extraction["bbox"] = json.loads(bbox) if bbox else None
     return extraction
+
+
+def row_to_annotation_set(row: sqlite3.Row) -> dict[str, Any]:
+    return dict(row)
+
+
+def row_to_annotation(row: sqlite3.Row) -> dict[str, Any]:
+    annotation = dict(row)
+    bbox = annotation.pop("bbox_json", None)
+    annotation["bbox"] = json.loads(bbox) if bbox else None
+    return annotation
 
 
 def _migrate_legacy_documents(db: sqlite3.Connection) -> None:

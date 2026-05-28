@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .bg{fill:#f8fafc}.title{font:700 34px Arial,sans-serif;fill:#0f172a}
+      .step{fill:#fff;stroke:#cbd5e1;stroke-width:2;rx:14}.blue{fill:#eff6ff;stroke:#2563eb}.green{fill:#ecfdf5;stroke:#059669}
+      .orange{fill:#fff7ed;stroke:#ea580c}.purple{fill:#f5f3ff;stroke:#7c3aed}.red{fill:#fef2f2;stroke:#dc2626}
+      .label{font:700 21px Arial,sans-serif;fill:#0f172a}.small{font:400 15px Arial,sans-serif;fill:#334155}
+      .num{font:700 18px Arial,sans-serif;fill:#fff}.circle{fill:#2563eb}.arrow{stroke:#2563eb;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .dash{stroke:#64748b;stroke-width:2.5;fill:none;marker-end:url(#arrow);stroke-dasharray:8 6}
+    </style>
+  </defs>
+  <rect class="bg" width="1600" height="760"/>
+  <text class="title" x="800" y="58" text-anchor="middle">Сценарий ручной разметки и подготовки обучения</text>
+
+  <rect class="step blue" x="70" y="150" width="205" height="135" rx="14"/>
+  <circle class="circle" cx="105" cy="184" r="17"/><text class="num" x="105" y="190" text-anchor="middle">1</text>
+  <text class="label" x="173" y="201" text-anchor="middle">Выбор</text>
+  <text class="label" x="173" y="227" text-anchor="middle">датасета</text>
+  <text class="small" x="173" y="258" text-anchor="middle">Active dataset</text>
+
+  <rect class="step blue" x="325" y="150" width="205" height="135" rx="14"/>
+  <circle class="circle" cx="360" cy="184" r="17"/><text class="num" x="360" y="190" text-anchor="middle">2</text>
+  <text class="label" x="428" y="201" text-anchor="middle">Выбор</text>
+  <text class="label" x="428" y="227" text-anchor="middle">документа</text>
+  <text class="small" x="428" y="258" text-anchor="middle">группа и файл</text>
+
+  <rect class="step green" x="580" y="150" width="205" height="135" rx="14"/>
+  <circle class="circle" cx="615" cy="184" r="17"/><text class="num" x="615" y="190" text-anchor="middle">3</text>
+  <text class="label" x="683" y="201" text-anchor="middle">Ввод</text>
+  <text class="label" x="683" y="227" text-anchor="middle">key и value</text>
+  <text class="small" x="683" y="258" text-anchor="middle">эталонная пара</text>
+
+  <rect class="step orange" x="835" y="150" width="205" height="135" rx="14"/>
+  <circle class="circle" cx="870" cy="184" r="17"/><text class="num" x="870" y="190" text-anchor="middle">4</text>
+  <text class="label" x="938" y="201" text-anchor="middle">Выделение</text>
+  <text class="label" x="938" y="227" text-anchor="middle">bbox</text>
+  <text class="small" x="938" y="258" text-anchor="middle">левая кнопка мыши</text>
+
+  <rect class="step purple" x="1090" y="150" width="205" height="135" rx="14"/>
+  <circle class="circle" cx="1125" cy="184" r="17"/><text class="num" x="1125" y="190" text-anchor="middle">5</text>
+  <text class="label" x="1193" y="201" text-anchor="middle">Сохранение</text>
+  <text class="label" x="1193" y="227" text-anchor="middle">аннотации</text>
+  <text class="small" x="1193" y="258" text-anchor="middle">SQLite</text>
+
+  <rect class="step red" x="1345" y="150" width="205" height="135" rx="14"/>
+  <circle class="circle" cx="1380" cy="184" r="17"/><text class="num" x="1380" y="190" text-anchor="middle">6</text>
+  <text class="label" x="1448" y="201" text-anchor="middle">Экспорт</text>
+  <text class="label" x="1448" y="227" text-anchor="middle">JSONL</text>
+  <text class="small" x="1448" y="258" text-anchor="middle">DeepSeek-OCR format</text>
+
+  <path class="arrow" d="M275 218 L315 218"/><path class="arrow" d="M530 218 L570 218"/>
+  <path class="arrow" d="M785 218 L825 218"/><path class="arrow" d="M1040 218 L1080 218"/>
+  <path class="arrow" d="M1295 218 L1335 218"/>
+
+  <rect class="step" x="300" y="455" width="335" height="130" rx="14"/>
+  <text class="label" x="468" y="500" text-anchor="middle">Настройка обучения</text>
+  <text class="small" x="468" y="533" text-anchor="middle">Training steps</text>
+  <text class="small" x="468" y="558" text-anchor="middle">KVP_TRAIN_COMMAND</text>
+
+  <rect class="step green" x="745" y="455" width="335" height="130" rx="14"/>
+  <text class="label" x="913" y="500" text-anchor="middle">Новый чекпоинт</text>
+  <text class="small" x="913" y="533" text-anchor="middle">trained_checkpoints/</text>
+  <text class="small" x="913" y="558" text-anchor="middle">доступен в списке моделей</text>
+
+  <rect class="step blue" x="1190" y="455" width="335" height="130" rx="14"/>
+  <text class="label" x="1358" y="500" text-anchor="middle">Извлечение</text>
+  <text class="small" x="1358" y="533" text-anchor="middle">выбор нового чекпоинта</text>
+  <text class="small" x="1358" y="558" text-anchor="middle">проверка результата и bbox</text>
+
+  <path class="arrow" d="M1448 285 C1430 380 1180 465 1090 515"/>
+  <path class="arrow" d="M745 520 L645 520"/>
+  <path class="dash" d="M1080 520 L1180 520"/>
+  <path class="dash" d="M913 455 C945 380 1170 320 1448 285"/>
+</svg>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="820" viewBox="0 0 1500 820">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .bg{fill:#f8fafc}.title{font:700 34px Arial,sans-serif;fill:#0f172a}
+      .box{fill:#fff;stroke:#cbd5e1;stroke-width:2;rx:12}.blue{fill:#eff6ff;stroke:#2563eb}
+      .green{fill:#ecfdf5;stroke:#059669}.orange{fill:#fff7ed;stroke:#ea580c}
+      .purple{fill:#f5f3ff;stroke:#7c3aed}.red{fill:#fef2f2;stroke:#dc2626}
+      .label{font:700 22px Arial,sans-serif;fill:#0f172a}.small{font:400 16px Arial,sans-serif;fill:#334155}
+      .tiny{font:400 14px Arial,sans-serif;fill:#64748b}.arrow{stroke:#2563eb;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .muted{stroke:#64748b;stroke-width:2.5;fill:none;marker-end:url(#arrow);stroke-dasharray:8 6}
+    </style>
+  </defs>
+  <rect class="bg" width="1500" height="820"/>
+  <text class="title" x="750" y="58" text-anchor="middle">Общая архитектура системы извлечения KVP</text>
+
+  <rect class="box blue" x="60" y="150" width="230" height="135" rx="14"/>
+  <text class="label" x="175" y="198" text-anchor="middle">Пользователь</text>
+  <text class="small" x="175" y="231" text-anchor="middle">загрузка документов</text>
+  <text class="small" x="175" y="257" text-anchor="middle">ключи и разметка</text>
+
+  <rect class="box blue" x="365" y="130" width="285" height="175" rx="14"/>
+  <text class="label" x="508" y="178" text-anchor="middle">Frontend</text>
+  <text class="small" x="508" y="211" text-anchor="middle">HTML / CSS / JavaScript</text>
+  <text class="small" x="508" y="237" text-anchor="middle">вкладка извлечения</text>
+  <text class="small" x="508" y="263" text-anchor="middle">вкладка разметки и обучения</text>
+
+  <rect class="box green" x="735" y="125" width="285" height="185" rx="14"/>
+  <text class="label" x="878" y="171" text-anchor="middle">FastAPI backend</text>
+  <text class="small" x="878" y="204" text-anchor="middle">API документов</text>
+  <text class="small" x="878" y="230" text-anchor="middle">API аннотаций</text>
+  <text class="small" x="878" y="256" text-anchor="middle">запуск извлечения и обучения</text>
+
+  <rect class="box orange" x="1130" y="85" width="300" height="145" rx="14"/>
+  <text class="label" x="1280" y="130" text-anchor="middle">SQLite</text>
+  <text class="small" x="1280" y="163" text-anchor="middle">группы и документы</text>
+  <text class="small" x="1280" y="189" text-anchor="middle">результаты, bbox, аннотации</text>
+
+  <rect class="box purple" x="1130" y="275" width="300" height="145" rx="14"/>
+  <text class="label" x="1280" y="320" text-anchor="middle">Файловое хранилище</text>
+  <text class="small" x="1280" y="353" text-anchor="middle">data/pages, uploads</text>
+  <text class="small" x="1280" y="379" text-anchor="middle">экспорт JSONL разметки</text>
+
+  <rect class="box red" x="705" y="505" width="350" height="155" rx="14"/>
+  <text class="label" x="880" y="550" text-anchor="middle">DeepSeek-OCR + LoRA</text>
+  <text class="small" x="880" y="583" text-anchor="middle">выбранный чекпоинт</text>
+  <text class="small" x="880" y="609" text-anchor="middle">image + key → value + bbox</text>
+  <text class="tiny" x="880" y="635" text-anchor="middle">&lt;|ref|&gt;...&lt;|det|&gt;...value</text>
+
+  <rect class="box" x="355" y="520" width="300" height="125" rx="14"/>
+  <text class="label" x="505" y="563" text-anchor="middle">Результат</text>
+  <text class="small" x="505" y="596" text-anchor="middle">значение и координаты bbox</text>
+  <text class="small" x="505" y="622" text-anchor="middle">подсветка на документе</text>
+
+  <rect class="box purple" x="1085" y="520" width="345" height="140" rx="14"/>
+  <text class="label" x="1258" y="562" text-anchor="middle">Обучение по разметке</text>
+  <text class="small" x="1258" y="595" text-anchor="middle">annotation_exports/*.jsonl</text>
+  <text class="small" x="1258" y="621" text-anchor="middle">trained_checkpoints/</text>
+
+  <path class="arrow" d="M290 218 L355 218"/>
+  <path class="arrow" d="M650 218 L725 218"/>
+  <path class="arrow" d="M1020 190 C1060 160 1080 155 1120 155"/>
+  <path class="arrow" d="M1020 258 C1070 298 1085 337 1120 348"/>
+  <path class="arrow" d="M878 310 L878 495"/>
+  <path class="arrow" d="M705 583 L665 583"/>
+  <path class="arrow" d="M505 520 C505 430 505 380 505 315"/>
+  <path class="muted" d="M1020 278 C1140 380 1240 450 1255 510"/>
+  <path class="muted" d="M1258 520 C1180 455 1055 400 930 495"/>
+</svg>

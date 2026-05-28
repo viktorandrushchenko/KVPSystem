@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .bg{fill:#f8fafc}.title{font:700 34px Arial,sans-serif;fill:#0f172a}
+      .table{fill:#fff;stroke:#cbd5e1;stroke-width:2;rx:12}.h1{fill:#2563eb}.h2{fill:#059669}.h3{fill:#ea580c}.h4{fill:#7c3aed}.h5{fill:#0f766e}
+      .head{font:700 22px Arial,sans-serif;fill:#fff}.field{font:400 17px Arial,sans-serif;fill:#1f2937}
+      .pk{font:700 17px Arial,sans-serif;fill:#0f172a}.fk{font:700 17px Arial,sans-serif;fill:#2563eb}
+      .note{font:400 14px Arial,sans-serif;fill:#64748b}.line{stroke:#e2e8f0;stroke-width:1}.rel{stroke:#2563eb;stroke-width:3;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="1600" height="900"/>
+  <text class="title" x="800" y="58" text-anchor="middle">Структура данных приложения</text>
+
+  <rect class="table" x="55" y="125" width="310" height="405" rx="14"/>
+  <rect class="h1" x="55" y="125" width="310" height="58" rx="14"/>
+  <text class="head" x="210" y="162" text-anchor="middle">documents / groups</text>
+  <line class="line" x1="55" y1="220" x2="365" y2="220"/>
+  <text class="pk" x="82" y="211">PK id</text>
+  <text class="field" x="82" y="250">filename</text>
+  <text class="note" x="190" y="250">название группы</text>
+  <text class="field" x="82" y="288">stored_path</text>
+  <text class="field" x="82" y="326">content_type</text>
+  <text class="field" x="82" y="364">size_bytes</text>
+  <text class="field" x="82" y="402">status, error</text>
+  <text class="field" x="82" y="440">created_at</text>
+  <text class="field" x="82" y="478">updated_at</text>
+
+  <rect class="table" x="455" y="105" width="335" height="445" rx="14"/>
+  <rect class="h2" x="455" y="105" width="335" height="58" rx="14"/>
+  <text class="head" x="623" y="142" text-anchor="middle">pages / documents</text>
+  <line class="line" x1="455" y1="200" x2="790" y2="200"/>
+  <text class="pk" x="482" y="191">PK id</text>
+  <text class="fk" x="482" y="230">FK document_id</text>
+  <text class="field" x="482" y="268">page_number</text>
+  <text class="field" x="482" y="306">page_title</text>
+  <text class="note" x="610" y="306">имя документа</text>
+  <text class="field" x="482" y="344">image_path</text>
+  <text class="field" x="482" y="382">status, error</text>
+  <text class="field" x="482" y="420">raw_output</text>
+  <text class="field" x="482" y="458">kv_pairs_json</text>
+  <text class="field" x="482" y="496">created_at / updated_at</text>
+
+  <rect class="table" x="875" y="105" width="335" height="445" rx="14"/>
+  <rect class="h3" x="875" y="105" width="335" height="58" rx="14"/>
+  <text class="head" x="1043" y="142" text-anchor="middle">page_extractions</text>
+  <line class="line" x1="875" y1="200" x2="1210" y2="200"/>
+  <text class="pk" x="902" y="191">PK id</text>
+  <text class="fk" x="902" y="230">FK page_id</text>
+  <text class="field" x="902" y="268">query_key</text>
+  <text class="field" x="902" y="306">value_text</text>
+  <text class="field" x="902" y="344">bbox_json</text>
+  <text class="field" x="902" y="382">ref_text</text>
+  <text class="field" x="902" y="420">confidence</text>
+  <text class="field" x="902" y="458">raw_output</text>
+  <text class="field" x="902" y="496">status / created_at / updated_at</text>
+
+  <rect class="table" x="455" y="630" width="335" height="210" rx="14"/>
+  <rect class="h4" x="455" y="630" width="335" height="58" rx="14"/>
+  <text class="head" x="623" y="667" text-anchor="middle">annotation_sets</text>
+  <line class="line" x1="455" y1="720" x2="790" y2="720"/>
+  <text class="pk" x="482" y="711">PK id</text>
+  <text class="field" x="482" y="750">name, description</text>
+  <text class="field" x="482" y="788">status, export_path</text>
+  <text class="field" x="482" y="826">checkpoint_path, training_log</text>
+
+  <rect class="table" x="875" y="610" width="335" height="250" rx="14"/>
+  <rect class="h5" x="875" y="610" width="335" height="58" rx="14"/>
+  <text class="head" x="1043" y="647" text-anchor="middle">annotations</text>
+  <line class="line" x1="875" y1="700" x2="1210" y2="700"/>
+  <text class="pk" x="902" y="691">PK id</text>
+  <text class="fk" x="902" y="730">FK annotation_set_id</text>
+  <text class="fk" x="902" y="768">FK page_id</text>
+  <text class="field" x="902" y="806">query_key, value_text</text>
+  <text class="field" x="902" y="844">bbox_json, created_at, updated_at</text>
+
+  <rect class="table" x="1295" y="610" width="250" height="170" rx="14"/>
+  <rect class="h1" x="1295" y="610" width="250" height="58" rx="14"/>
+  <text class="head" x="1420" y="647" text-anchor="middle">JSON-файлы</text>
+  <text class="field" x="1320" y="710">checkpoint_names.json</text>
+  <text class="field" x="1320" y="748">annotation_exports/*.jsonl</text>
+
+  <path class="rel" d="M365 330 C395 330 420 330 445 330"/>
+  <path class="rel" d="M790 330 C820 330 845 330 865 330"/>
+  <path class="rel" d="M790 735 C820 735 845 735 865 735"/>
+  <path class="rel" d="M1043 610 C1010 580 715 580 660 550"/>
+  <path class="rel" d="M1210 735 C1245 735 1265 710 1285 700"/>
+</svg>

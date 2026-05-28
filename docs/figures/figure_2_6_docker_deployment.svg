@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="820" viewBox="0 0 1600 820">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .bg{fill:#f8fafc}.title{font:700 34px Arial,sans-serif;fill:#0f172a}
+      .host{fill:#fff;stroke:#94a3b8;stroke-width:3;rx:18}.container{fill:#eff6ff;stroke:#2563eb;stroke-width:3;rx:16}
+      .folder{fill:#fff7ed;stroke:#ea580c;stroke-width:2;rx:12}.gpu{fill:#ecfdf5;stroke:#059669;stroke-width:2;rx:12}.service{fill:#f5f3ff;stroke:#7c3aed;stroke-width:2;rx:12}
+      .label{font:700 23px Arial,sans-serif;fill:#0f172a}.small{font:400 16px Arial,sans-serif;fill:#334155}.tiny{font:400 14px Arial,sans-serif;fill:#64748b}
+      .mount{stroke:#ea580c;stroke-width:3;fill:none;marker-end:url(#arrow);stroke-dasharray:8 6}.line{stroke:#2563eb;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .gpu-line{stroke:#059669;stroke-width:3;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="1600" height="820"/>
+  <text class="title" x="800" y="58" text-anchor="middle">Docker-схема запуска приложения</text>
+
+  <rect class="host" x="70" y="105" width="1460" height="620" rx="18"/>
+  <text class="label" x="175" y="150">Host machine</text>
+  <text class="small" x="175" y="179">локальный проект, Docker Desktop, модель и данные на диске</text>
+
+  <rect class="container" x="570" y="185" width="460" height="350" rx="16"/>
+  <text class="label" x="800" y="232" text-anchor="middle">Docker container</text>
+  <text class="small" x="800" y="264" text-anchor="middle">FastAPI + Uvicorn</text>
+  <text class="small" x="800" y="292" text-anchor="middle">статический frontend</text>
+  <text class="small" x="800" y="320" text-anchor="middle">DeepSeek-OCR runtime</text>
+  <rect class="service" x="650" y="380" width="300" height="90" rx="12"/>
+  <text class="label" x="800" y="417" text-anchor="middle">kvp-app</text>
+  <text class="small" x="800" y="447" text-anchor="middle">порт 8000</text>
+
+  <rect class="folder" x="135" y="240" width="310" height="86" rx="12"/>
+  <text class="label" x="290" y="273" text-anchor="middle">data/</text>
+  <text class="small" x="290" y="301" text-anchor="middle">SQLite, uploads, pages</text>
+
+  <rect class="folder" x="135" y="355" width="310" height="86" rx="12"/>
+  <text class="label" x="290" y="388" text-anchor="middle">deepseek_ocr/</text>
+  <text class="small" x="290" y="416" text-anchor="middle">базовая модель</text>
+
+  <rect class="folder" x="135" y="470" width="310" height="86" rx="12"/>
+  <text class="label" x="290" y="503" text-anchor="middle">checkpoint-1/</text>
+  <text class="small" x="290" y="531" text-anchor="middle">исходный LoRA-адаптер</text>
+
+  <rect class="folder" x="135" y="585" width="310" height="86" rx="12"/>
+  <text class="label" x="290" y="618" text-anchor="middle">trained_checkpoints/</text>
+  <text class="small" x="290" y="646" text-anchor="middle">новые адаптеры</text>
+
+  <rect class="gpu" x="1165" y="300" width="300" height="120" rx="12"/>
+  <text class="label" x="1315" y="338" text-anchor="middle">GPU / CUDA</text>
+  <text class="small" x="1315" y="369" text-anchor="middle">любой поддерживаемый GPU</text>
+  <text class="small" x="1315" y="395" text-anchor="middle">PyTorch CUDA</text>
+
+  <rect class="service" x="1165" y="495" width="300" height="95" rx="12"/>
+  <text class="label" x="1315" y="531" text-anchor="middle">Browser</text>
+  <text class="small" x="1315" y="561" text-anchor="middle">web-интерфейс</text>
+
+  <path class="mount" d="M445 283 C500 283 520 285 560 300"/>
+  <path class="mount" d="M445 398 C500 390 520 365 560 345"/>
+  <path class="mount" d="M445 513 C500 505 530 465 570 440"/>
+  <path class="mount" d="M445 628 C520 610 560 540 615 470"/>
+  <path class="gpu-line" d="M1030 360 L1155 360"/>
+  <path class="line" d="M1030 425 C1090 460 1125 520 1155 543"/>
+  <path class="line" d="M1315 495 C1270 430 1115 410 1040 425"/>
+  <text class="tiny" x="800" y="682" text-anchor="middle">docker compose up --build / docker compose up -d</text>
+</svg>
