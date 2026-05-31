@@ -60,6 +60,8 @@ Invoice Number
 
 ![Внешний вид приложения](UI.png)
 
+![Интерфейс ручной разметки](docs/figures/UI%20annotations.png)
+
 ## Структура проекта
 
 - `app/` - FastAPI backend и статический frontend.
